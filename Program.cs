@@ -14,23 +14,19 @@ namespace lab3
         {
             Thread[] writers = new Thread[3];
             Thread[] readers = new Thread[2];
-            AutoResetEvent evFull = new AutoResetEvent(false);
-            AutoResetEvent evEmpty = new AutoResetEvent(true);
-            SemaphoreSlim semReader = new SemaphoreSlim(0,2);
-            SemaphoreSlim semWriter = new SemaphoreSlim(0,3);
             MyMessage.Add("AAAA");
             MyMessage.Add("BBBB");
             MyMessage.Add("CCCC");
             for (int i = 0; i < writers.Length; i++)
             {
                 writers[i] = new Thread(Writer);
-                writers[i].Start(new object[] { i, semWriter });
+                writers[i].Start(new object[] { i });
             }
            
             for (int i = 0; i < readers.Length; i++)
             {
                 readers[i] = new Thread(Reader);
-                readers[i].Start(new object[] { i, semReader });
+                readers[i].Start(new object[] { i });
             }
 
             for (int i = 0; i < writers.Length; i++)
@@ -46,40 +42,37 @@ namespace lab3
 
         static void Writer(object state)
         {
-            int numWorker = (int)((object[]) state)[0];
-            var semWriter = ((object[])state)[1] as SemaphoreSlim;
+            int numWorker = (int)((object[])state)[0];
             int i = 0;
             int n = 3;
             while (i < n)
             {
-                if (bEmpty)
+                lock ("write")
                 {
-                    semWriter.Wait(500);
                     if (bEmpty)
                     {
-                        bEmpty = false;
                         buffer = "Writer:" + (numWorker + 1) + "Message:" + MyMessage[i++] + i;
+                        bEmpty = false;
                     }
-                    semWriter.Release(1);
                 }
             }
         }
         static void Reader(object state)
         {
             int numWorker = (int)((object[])state)[0];
-            var semReader = ((object[])state)[1] as SemaphoreSlim;
             while (!finish)
             {
                 if (!bEmpty)
                 {
-                    semReader.Wait(500);
-                    if (!bEmpty)
+                    lock ("read")
                     {
-                        bEmpty = true;
-                        MyMessage.Add(buffer);
-                        Console.WriteLine("Reader:" + (numWorker + 1) + buffer);
+                        if (!bEmpty)
+                        {
+                            bEmpty = true;
+                            MyMessage.Add(buffer);
+                            Console.WriteLine("Reader:" + (numWorker + 1) + buffer);
+                        }
                     }
-                    semReader.Release(1);
                 }
             }
         }
