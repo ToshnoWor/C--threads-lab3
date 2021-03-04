@@ -18,6 +18,8 @@ namespace lab3
             MyMessage.Add("AAAA");
             MyMessage.Add("BBBB");
             MyMessage.Add("CCCC");
+            DateTime dt1, dt2;
+            dt1 = DateTime.Now;
             for (int i = 0; i < writers.Length; i++)
             {
                 writers[i] = new Thread(Writer);
@@ -29,7 +31,6 @@ namespace lab3
                 readers[i] = new Thread(Reader);
                 readers[i].Start(new object[] { i, evFull, evEmpty });
             }
-
             for (int i = 0; i < writers.Length; i++)
             {
                 writers[i].Join();
@@ -40,6 +41,9 @@ namespace lab3
             {
                 readers[i].Join();
             }
+            dt2 = DateTime.Now;
+            TimeSpan ts = dt2 - dt1;
+            Console.WriteLine("Full time:{0}", ts.TotalMilliseconds);
         }
 
         static void Writer(object state)
@@ -48,7 +52,7 @@ namespace lab3
             var evFull = ((object[])state)[1] as AutoResetEvent;
             var evEmpty = ((object[])state)[2] as AutoResetEvent;
             int i = 0;
-            int n = 3;
+            int n = 1000;
             while (i < n)
             {
                 evEmpty.WaitOne();
