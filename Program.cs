@@ -21,6 +21,8 @@ namespace lab3
             MyMessage.Add("AAAA");
             MyMessage.Add("BBBB");
             MyMessage.Add("CCCC");
+            DateTime dt1, dt2;
+            dt1 = DateTime.Now;
             for (int i = 0; i < writers.Length; i++)
             {
                 writers[i] = new Thread(Writer);
@@ -42,6 +44,9 @@ namespace lab3
             {
                 readers[i].Join();
             }
+            dt2 = DateTime.Now;
+            TimeSpan ts = dt2 - dt1;
+            Console.WriteLine("Time : {0}", ts.TotalMilliseconds);
         }
 
         static void Writer(object state)
@@ -49,7 +54,7 @@ namespace lab3
             int numWorker = (int)((object[]) state)[0];
             var semWriter = ((object[])state)[1] as SemaphoreSlim;
             int i = 0;
-            int n = 3;
+            int n = 100;
             while (i < n)
             {
                 if (bEmpty)

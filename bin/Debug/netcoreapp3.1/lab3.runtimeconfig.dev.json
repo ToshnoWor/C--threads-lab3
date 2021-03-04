@@ -2,7 +2,8 @@
   "runtimeOptions": {
     "additionalProbingPaths": [
       "C:\\Users\\aleks\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\aleks\\.nuget\\packages"
+      "C:\\Users\\aleks\\.nuget\\packages",
+      "D:\\Programms\\Microsoft Visual Studio\\SDK\\NuGetPackages"
     ]
   }
 }
